@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { getGames } from '../../utils/data/gameData';
-import { createEvent } from '../../utils/data/eventData';
+import { createEvent, updateEvent } from '../../utils/data/eventData';
 
-const EventForm = ({ user }) => {
+const EventForm = ({ user, eventObj }) => {
   const router = useRouter();
   const [games, setGames] = useState([]);
   const [currentEvent, setCurrentEvent] = useState({
-    game: '',
+    game: 0,
     description: '',
     date: '',
     time: '',
@@ -17,7 +17,16 @@ const EventForm = ({ user }) => {
 
   useEffect(() => {
     getGames().then(setGames);
-  }, []);
+    if (eventObj?.id) {
+      const editEvent = {
+        game: eventObj.game.id,
+        time: eventObj.time,
+        date: eventObj.date,
+        description: eventObj.description,
+      };
+      setCurrentEvent(editEvent);
+    }
+  }, [eventObj, user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,15 +38,18 @@ const EventForm = ({ user }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const event = {
       game: Number(currentEvent.game),
       description: currentEvent.description,
       date: currentEvent.date,
       time: currentEvent.time,
-      organizer: Number(user.uid),
+      organizer: user.uid,
     };
-    createEvent(event).then(() => router.push('/events'));
+    if (eventObj.id) {
+      updateEvent(event, eventObj.id).then(() => router.push('/events'));
+    } else {
+      createEvent(event).then(() => router.push('/events'));
+    }
   };
   return (
     <>
@@ -68,6 +80,20 @@ const EventForm = ({ user }) => {
 EventForm.propTypes = {
   user: PropTypes.shape({
     uid: PropTypes.string.isRequired,
+  }).isRequired,
+  eventObj: PropTypes.shape({
+    id: PropTypes.number,
+    description: PropTypes.string,
+    date: PropTypes.string,
+    time: PropTypes.string,
+    game: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string.isRequired,
+    }),
+    organizer: PropTypes.shape({
+      id: PropTypes.number,
+      uid: PropTypes.string,
+    }),
   }).isRequired,
 };
 export default EventForm;

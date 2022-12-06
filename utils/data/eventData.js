@@ -2,13 +2,24 @@ import { clientCredentials } from '../client';
 
 const dbUrl = clientCredentials.databaseURL;
 
-const getEvents = () => new Promise((resolve, reject) => {
-  fetch(`${dbUrl}/events`)
+const getEvents = (uid) => new Promise((resolve, reject) => {
+  fetch(`${dbUrl}/events`, {
+    method: 'GET',
+    headers: {
+      Authorization: uid,
+    },
+  })
     .then((response) => response.json())
     .then(resolve)
     .catch(reject);
 });
 
+const getEvent = (eventId) => new Promise((resolve, reject) => {
+  fetch(`${dbUrl}/events/${eventId}`)
+    .then((response) => response.json())
+    .then(resolve)
+    .catch(reject);
+});
 const createEvent = (event) => new Promise((resolve, reject) => {
   fetch(`${dbUrl}/events`, {
     method: 'POST',
@@ -21,5 +32,15 @@ const createEvent = (event) => new Promise((resolve, reject) => {
     .then((response) => resolve(response.data))
     .catch(reject);
 });
-
-export { getEvents, createEvent };
+const updateEvent = (data, id) => new Promise((resolve, reject) => {
+  fetch(`${dbUrl}/events/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+    .then((response) => resolve(response))
+    .catch((error) => reject(error));
+});
+export {
+  getEvents, getEvent, createEvent, updateEvent,
+};

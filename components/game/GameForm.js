@@ -2,27 +2,32 @@ import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { createGame, getGameTypes } from '../../utils/data/gameData';
+import { createGame, getGameTypes, updateGame } from '../../utils/data/gameData';
 
-const GameForm = ({ user }) => {
+const GameForm = ({ user, gameObj }) => {
   const [gameTypes, setGameTypes] = useState([]);
-  /*
-  Since the input fields are bound to the values of
-  the properties of this state variable, you need to
-  provide some default values.
-  */
   const [currentGame, setCurrentGame] = useState({
-    skillLevel: 1,
-    numberOfPlayers: 0,
+    skill_level: null,
+    number_of_players: null,
     title: '',
     maker: '',
-    gameTypeId: 0,
+    game_type: null,
   });
   const router = useRouter();
 
   useEffect(() => {
     getGameTypes().then(setGameTypes);
-  }, []);
+    if (gameObj?.id) {
+      const editGame = {
+        skill_level: gameObj.skill_level,
+        number_of_players: gameObj.number_of_players,
+        title: gameObj.title,
+        maker: gameObj.maker,
+        game_type: gameObj.game_type.id,
+      };
+      setCurrentGame(editGame);
+    }
+  }, [gameObj, user]);
 
   const handleChange = (e) => {
     // TODO: Complete the onChange function
@@ -34,20 +39,20 @@ const GameForm = ({ user }) => {
   };
 
   const handleSubmit = (e) => {
-    // Prevent form from being submitted
     e.preventDefault();
-
     const game = {
       maker: currentGame.maker,
       title: currentGame.title,
-      number_of_players: Number(currentGame.numberOfPlayers),
-      skill_level: Number(currentGame.skillLevel),
-      game_type: Number(currentGame.gameTypeId),
+      number_of_players: Number(currentGame.number_of_players),
+      skill_level: Number(currentGame.skill_level),
+      game_type: Number(currentGame.game_type),
       user_id: user.uid,
     };
-
-    // Send POST request to your API
-    createGame(game).then(() => router.push('/games'));
+    if (gameObj.id) {
+      updateGame(game, gameObj.id).then(() => router.push('/games'));
+    } else {
+      createGame(game).then(() => router.push('/games'));
+    }
   };
 
   return (
@@ -65,7 +70,7 @@ const GameForm = ({ user }) => {
           <Form.Select name="gameTypeId" value={currentGame.game_type} onChange={handleChange}>
             <option value=""> Select a Game Type </option>
             {gameTypes?.map((type) => (
-              <option key={type.id} value={type.id} defaultValue={currentGame.gameTypeId === type.id}>
+              <option key={type.id} value={type.id} defaultValue={type.id === currentGame.game_type}>
                 {type.label}
               </option>
             ))}
@@ -82,6 +87,17 @@ const GameForm = ({ user }) => {
 GameForm.propTypes = {
   user: PropTypes.shape({
     uid: PropTypes.string.isRequired,
+  }).isRequired,
+  gameObj: PropTypes.shape({
+    id: PropTypes.number,
+    title: PropTypes.string,
+    maker: PropTypes.string,
+    number_of_players: PropTypes.number,
+    skill_level: PropTypes.number,
+    game_type: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      label: PropTypes.string.isRequired,
+    }),
   }).isRequired,
 };
 
