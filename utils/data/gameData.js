@@ -9,6 +9,13 @@ const getGames = () => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
+const getGame = (gameId) => new Promise((resolve, reject) => {
+  fetch(`${dbUrl}/games/${gameId}`)
+    .then((response) => response.json())
+    .then(resolve)
+    .catch(reject);
+});
+
 const createGame = (game) => new Promise((resolve, reject) => {
   fetch(`${dbUrl}/games`, {
     method: 'POST',
@@ -22,6 +29,16 @@ const createGame = (game) => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
+const updateGame = (data, id) => new Promise((resolve, reject) => {
+  fetch(`${dbUrl}/games/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+    .then((response) => resolve(response))
+    .catch((error) => reject(error));
+});
+
 const getGameTypes = () => new Promise((resolve, reject) => {
   fetch(`${dbUrl}/gametypes`)
     .then((response) => response.json())
@@ -29,5 +46,7 @@ const getGameTypes = () => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
-export { getGames, createGame, getGameTypes };
+export {
+  getGames, getGame, createGame, updateGame, getGameTypes,
+};
 // eslint-disable-next-line import/prefer-default-export
