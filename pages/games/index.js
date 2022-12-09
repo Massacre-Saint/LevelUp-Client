@@ -7,8 +7,11 @@ import { getGames } from '../../utils/data/gameData';
 function Home() {
   const [games, setGames] = useState([]);
   const router = useRouter();
-  useEffect(() => {
+  const showGames = () => {
     getGames().then((data) => setGames(data));
+  };
+  useEffect(() => {
+    showGames();
   }, []);
   console.warn(games);
   return (
@@ -24,7 +27,7 @@ function Home() {
       </Button>
       {games.map((game) => (
         <section key={`game--${game.id}`} className="game">
-          <GameCard id={game.id} title={game.title} maker={game.maker} numberOfPlayers={game.number_of_players} skillLevel={game.skill_level} gamerId={game.gamer.id} onUpdate={getGames} />
+          <GameCard gameObj={game} onUpdate={showGames} />
         </section>
       ))}
     </article>

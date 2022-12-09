@@ -41,6 +41,15 @@ const updateEvent = (data, id) => new Promise((resolve, reject) => {
     .then((response) => resolve(response))
     .catch((error) => reject(error));
 });
+
+const deleteSingleEvent = (id) => new Promise((resolve, reject) => {
+  fetch(`${dbUrl}/events/${id}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  })
+    .then((response) => resolve(response))
+    .catch((error) => reject(error));
+});
 export {
-  getEvents, getEvent, createEvent, updateEvent,
+  getEvents, getEvent, createEvent, updateEvent, deleteSingleEvent,
 };
