@@ -7,11 +7,11 @@ import { createGame, getGameTypes, updateGame } from '../../utils/data/gameData'
 const GameForm = ({ user, gameObj }) => {
   const [gameTypes, setGameTypes] = useState([]);
   const [currentGame, setCurrentGame] = useState({
-    skill_level: null,
-    number_of_players: null,
+    skill_level: 0,
+    number_of_players: 0,
     title: '',
     maker: '',
-    game_type: null,
+    game_type: 0,
   });
   const router = useRouter();
 
@@ -46,9 +46,9 @@ const GameForm = ({ user, gameObj }) => {
       number_of_players: Number(currentGame.number_of_players),
       skill_level: Number(currentGame.skill_level),
       game_type: Number(currentGame.game_type),
-      user_id: user.uid,
+      gamer: user.uid,
     };
-    if (gameObj.id) {
+    if (gameObj?.id) {
       updateGame(game, gameObj.id).then(() => router.push('/games'));
     } else {
       createGame(game).then(() => router.push('/games'));
@@ -67,12 +67,10 @@ const GameForm = ({ user, gameObj }) => {
           <Form.Control name="number_of_players" type="number" required value={currentGame.number_of_players} onChange={handleChange} />
           <Form.Label>Skill Level</Form.Label>
           <Form.Control name="skill_level" type="number" required value={currentGame.skill_level} onChange={handleChange} />
-          <Form.Select name="gameTypeId" value={currentGame.game_type} onChange={handleChange}>
+          <Form.Select name="game_type" value={currentGame.game_type} onChange={handleChange}>
             <option value=""> Select a Game Type </option>
             {gameTypes?.map((type) => (
-              <option key={type.id} value={type.id} defaultValue={type.id === currentGame.game_type}>
-                {type.label}
-              </option>
+              <option key={type.id} value={type.id} label={type.label} />
             ))}
           </Form.Select>
         </Form.Group>

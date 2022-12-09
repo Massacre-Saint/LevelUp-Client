@@ -46,7 +46,15 @@ const getGameTypes = () => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
+const deleteSingleGame = (id) => new Promise((resolve, reject) => {
+  fetch(`${dbUrl}/games/${id}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  })
+    .then((response) => resolve(response))
+    .catch((error) => reject(error));
+});
 export {
-  getGames, getGame, createGame, updateGame, getGameTypes,
+  getGames, getGame, createGame, updateGame, getGameTypes, deleteSingleGame,
 };
 // eslint-disable-next-line import/prefer-default-export
